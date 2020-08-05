@@ -1,23 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import * as tf from "@tensorflow/tfjs";
+import housing from "./data/housing.csv";
+// tfjs-node-gpu better performance, uses webgl
 
 function App() {
+  const [sampleData, setSampleData] = useState([]);
+  async function showSampleDataset(dataset) {
+    const housingDataset = tf.data.csv(dataset);
+    const sampleDataset = housingDataset.take(3);
+    const dataArray = await sampleDataset.toArray();
+    return dataArray;
+  }
+
+  useEffect(() => {
+    showSampleDataset(housing).then(setSampleData);
+  }, []);
+
+  if (!sampleData[0]) {
+    return "";
+  }
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <p>TensorflowJS version: {tf.version.tfjs}</p>
+        {sampleData.map((el, i) => (
+          <p key={i}>{el.longitude}</p>
+        ))}
       </header>
     </div>
   );
