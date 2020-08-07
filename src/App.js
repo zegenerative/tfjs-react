@@ -1,30 +1,34 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import * as tf from "@tensorflow/tfjs";
-import housing from "./data/housing.csv";
+import request from "superagent";
+import * as tfvis from "@tensorflow/tfjs-vis";
 // tfjs-node-gpu better performance, uses webgl
 
 function App() {
   const [sampleData, setSampleData] = useState([]);
-  async function showSampleDataset(dataset) {
-    const housingDataset = tf.data.csv(dataset);
-    const sampleDataset = housingDataset.take(3);
-    const dataArray = await sampleDataset.toArray();
-    return dataArray;
+
+  async function fetchDataset() {
+    const dataset = await request("/home")
+      .then((res) => {
+        return res.body;
+      })
+      .catch(console.error);
+    setSampleData(dataset);
   }
 
   useEffect(() => {
-    showSampleDataset(housing).then(setSampleData);
+    fetchDataset();
   }, []);
 
   if (!sampleData[0]) {
     return "";
   }
+  console.log(sampleData[0]);
 
   return (
     <div className="App">
       <header className="App-header">
-        <p>TensorflowJS version: {tf.version.tfjs}</p>
+        <p>TensorflowJS-vis version: {tfvis.version}</p>
         {sampleData.map((el, i) => (
           <p key={i}>{el.longitude}</p>
         ))}
