@@ -7,6 +7,17 @@ import * as tfvis from "@tensorflow/tfjs-vis";
 function App() {
   const [sampleData, setSampleData] = useState([]);
 
+  function plot(pointsArray, featureName) {
+    tfvis.render.scatterplot(
+      { name: `${featureName} vs House price` },
+      { values: [pointsArray], series: ["original"] },
+      {
+        xLabel: featureName,
+        yLabel: "Price",
+      }
+    );
+  }
+
   async function fetchDataset() {
     const dataset = await request("/home")
       .then((res) => {
@@ -20,16 +31,17 @@ function App() {
     fetchDataset();
   }, []);
 
-  if (!sampleData[0]) {
+  if (!sampleData.result) {
     return "";
   }
-  console.log(sampleData[0]);
+
+  plot(sampleData.points, "House Age");
 
   return (
     <div className="App">
       <header className="App-header">
         <p>TensorflowJS-vis version: {tfvis.version}</p>
-        {sampleData.map((el, i) => (
+        {sampleData.result.map((el, i) => (
           <p key={i}>{el.longitude}</p>
         ))}
       </header>
