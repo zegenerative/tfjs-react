@@ -5,7 +5,7 @@ import * as tfvis from "@tensorflow/tfjs-vis";
 // tfjs-node-gpu better performance, uses webgl
 
 function App() {
-  const [sampleData, setSampleData] = useState([]);
+  const [data, setData] = useState([]);
 
   function plot(pointsArray, featureName) {
     tfvis.render.scatterplot(
@@ -18,32 +18,40 @@ function App() {
     );
   }
 
+  function showSummary(name, model) {
+    tfvis.show.modelSummary({ name }, JSON.parse(model));
+  }
+
   async function fetchDataset() {
-    const dataset = await request("/home")
+    const data = await request("/home")
       .then((res) => {
+        console.log(res);
         return res.body;
       })
       .catch(console.error);
-    setSampleData(dataset);
+    setData(data);
   }
 
   useEffect(() => {
     fetchDataset();
   }, []);
 
-  if (!sampleData.result) {
-    return "";
+  if (!data.model) {
+    return (
+      <div className="App">
+        <header className="App-header">Loading...</header>;
+      </div>
+    );
   }
 
-  plot(sampleData.points, "House Age");
+  console.log(data.trainingLoss, data.testingLoss);
+  plot(data.points, "House Age");
+  // showSummary("Model summary", data.model);
 
   return (
     <div className="App">
       <header className="App-header">
         <p>TensorflowJS-vis version: {tfvis.version}</p>
-        {sampleData.result.map((el, i) => (
-          <p key={i}>{el.longitude}</p>
-        ))}
       </header>
     </div>
   );
