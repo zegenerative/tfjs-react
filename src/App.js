@@ -1,27 +1,52 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import request from "superagent";
-import Home from "./components/Home";
-// tfjs-node-gpu better performance, uses webgl
+import * as tfvis from "@tensorflow/tfjs-vis";
+import TrainAndTest from "./components/TrainAndTest";
+import Predict from "./components/Predict";
+import { run } from "./tensorflowjs";
+import { plot } from "./utils/tfjsvis";
+import { Segment } from "semantic-ui-react";
+
+const housingPrices = "http://localhost:3000/housing.csv";
+// tfjs-node-gpu better performance, but as of august 2020 only CUDA(Linux) + nvidia
 
 function App() {
   const [data, setData] = useState([]);
 
-  async function fetchDataset() {
-    const data = await request("/home")
-      .then((res) => {
-        console.log(res);
-        return res.body;
-      })
-      .catch(console.error);
-    setData(data);
-  }
+  //check if uses WebGL:
+  // console.log(tf.getBackend());
 
   useEffect(() => {
-    fetchDataset();
+    run(housingPrices).then(setData);
   }, []);
 
-  return <Home data={data} />;
+  if (!data.model) {
+    return (
+      <>
+        <header className="App-header">
+          Linear regression with TensorflowJS
+        </header>
+        <p>Loading...</p>
+      </>
+    );
+  }
+  plot(data.points, "House Age");
+  tfvis.show.modelSummary({ name: "Model summary" }, data.model);
+  return (
+    <>
+      <header className="App-header">
+        Linear regression with TensorflowJS
+      </header>
+      <Segment.Group>
+        <Segment>
+          <TrainAndTest data={data} />;
+        </Segment>
+        <Segment>
+          <Predict data={data} setData={setData} />;
+        </Segment>
+      </Segment.Group>
+    </>
+  );
 }
 
 export default App;

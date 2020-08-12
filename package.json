@@ -4,6 +4,7 @@
   "private": true,
   "proxy": "http://localhost:4000",
   "dependencies": {
+    "@material-ui/core": "^4.11.0",
     "@tensorflow/tfjs": "^2.1.0",
     "@tensorflow/tfjs-node": "^2.1.0",
     "@tensorflow/tfjs-node-gpu": "^2.1.0",
@@ -14,6 +15,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
+    "semantic-ui-react": "^1.1.1",
     "superagent": "^5.3.1"
   },
   "scripts": {
