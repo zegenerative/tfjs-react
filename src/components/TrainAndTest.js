@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Segment } from "semantic-ui-react";
+import { Button, Segment, Header, Divider } from "semantic-ui-react";
 import { saveModel, loadModel } from "../tensorflowjs";
 
 const TrainAndTest = ({ data }) => {
@@ -14,7 +14,8 @@ const TrainAndTest = ({ data }) => {
   return (
     <Segment.Group>
       <Segment>
-        <header>Train and test your model</header>
+        <Header>Train and test your model</Header>
+        <Divider />
         <p>Training status:</p>
         <p>Testing status:</p>
         <Button>Train new model</Button>

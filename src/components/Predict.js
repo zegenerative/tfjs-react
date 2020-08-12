@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Button, Form, Input, Segment, SegmentGroup } from "semantic-ui-react";
+import {
+  Button,
+  Form,
+  Input,
+  Segment,
+  SegmentGroup,
+  Header,
+  Divider,
+} from "semantic-ui-react";
 import { predict } from "../tensorflowjs";
 
 const Predict = ({ data }) => {
@@ -30,14 +38,15 @@ const Predict = ({ data }) => {
     <>
       <Segment.Group>
         <Segment>
-          <header>Predict:</header>
+          <Header>Predict:</Header>
+          <Divider />
+
           <Form>
             <Form.Field>
-              <label>Value</label>
               <Input
                 type="number"
                 size="small"
-                placeholder="value"
+                placeholder="enter a value"
                 value={input}
                 onChange={handleChange}
               />
@@ -48,9 +57,10 @@ const Predict = ({ data }) => {
       </Segment.Group>
       <SegmentGroup>
         <Segment>
-          <p>Results:</p>
+          <Header>Results:</Header>
+          <Divider />
+
           <p>{prediction}</p>
-          <button onClick={() => console.log(prediction)}>test</button>
         </Segment>
       </SegmentGroup>
     </>
