@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  Button,
   Form,
   Input,
   Segment,
@@ -10,37 +9,25 @@ import {
 } from "semantic-ui-react";
 import { predict } from "../tensorflowjs";
 
-const Predict = ({ data }) => {
+const Predict = ({ data, model }) => {
   const [input, setInput] = useState(undefined);
   const [prediction, setPrediction] = useState(undefined);
 
   function submitInput(event) {
     event.preventDefault();
-    predict(
-      input,
-      data.model,
-      data.normalizedFeature,
-      data.normalizedLabel
-    ).then(setPrediction);
+    predict(input, model, data.normalizedFeature, data.normalizedLabel).then(
+      setPrediction
+    );
   }
 
   const handleChange = (e, value) => setInput(parseInt(value.value));
 
-  if (!data.model) {
-    return (
-      <div className="App">
-        <p>Loading....</p>
-      </div>
-    );
-  }
-  console.log(prediction);
   return (
     <>
       <Segment.Group>
         <Segment>
           <Header>Predict:</Header>
           <Divider />
-
           <Form>
             <Form.Field>
               <Input
@@ -59,7 +46,6 @@ const Predict = ({ data }) => {
         <Segment>
           <Header>Results:</Header>
           <Divider />
-
           <p>{prediction}</p>
         </Segment>
       </SegmentGroup>

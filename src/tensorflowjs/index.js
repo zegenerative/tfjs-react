@@ -1,8 +1,9 @@
 import * as tf from "@tensorflow/tfjs";
-const date = new Date();
+import * as tfvis from "@tensorflow/tfjs-vis";
+// tfjs-node-gpu better performance, but as of august 2020 only CUDA(Linux) + nvidia
 const { normalize, denormalize } = require("../utils/normalization");
 
-export function createModel() {
+function createModel() {
   const model = tf.sequential();
 
   model.add(
@@ -27,20 +28,48 @@ export function createModel() {
 // number of batches = dataset(rows) / batch size
 // training steps (epochs) = number of batches
 
-export async function trainModel(
+export async function trainModel(trainingFeatureTensor, trainingLabelTensor) {
+  const model = createModel();
+  return await train(model, trainingFeatureTensor, trainingLabelTensor);
+}
+
+async function train(model, trainingFeatureTensor, trainingLabelTensor) {
+  const { onEpochEnd } = tfvis.show.fitCallbacks(
+    { name: "Training Performance" },
+    ["loss"]
+  );
+  const trainingResults = await model.fit(
+    trainingFeatureTensor,
+    trainingLabelTensor,
+    {
+      batchSize: 32,
+      epochs: 3,
+      callbacks: {
+        onEpochEnd,
+      },
+      validationSplit: 0.2,
+    }
+  );
+  const trainingLoss = trainingResults.history.loss.pop();
+  const validationLoss = trainingResults.history.val_loss.pop();
+  return {
+    model,
+    trainingResults,
+    trainingLoss,
+    validationLoss,
+  };
+}
+
+export async function testModel(
   model,
-  trainingFeatureTensor,
-  trainingLabelTensor
+  testingFeatureTensor,
+  testingLabelTensor
 ) {
-  return model.fit(trainingFeatureTensor, trainingLabelTensor, {
-    batchSize: 32,
-    epochs: 20,
-    callbacks: {
-      onEpochEnd: (epoch, log) =>
-        console.log(`Epoch ${epoch}: loss = ${log.loss}`),
-    },
-    validationSplit: 0.2,
-  });
+  console.log("testing", model, testingFeatureTensor, testingLabelTensor);
+  const lossTensor = model.evaluate(testingFeatureTensor, testingLabelTensor);
+  const loss = await lossTensor.dataSync();
+  console.log(loss);
+  return loss;
 }
 
 const storageID = "test";
@@ -88,7 +117,7 @@ export async function predict(
   return result;
 }
 
-export async function run(dataset) {
+export async function loadData(dataset) {
   const housingDataset = await tf.data.csv(dataset);
 
   const pointsDataset = housingDataset.map((record) => ({
@@ -98,14 +127,18 @@ export async function run(dataset) {
   const points = await pointsDataset.toArray();
   tf.util.shuffle(points);
 
+  // extract features
   const featureValues = points.map((p) => p.x);
   const featureTensor = tf.tensor2d(featureValues, [featureValues.length, 1]);
 
+  // extract labels
   const labelValues = points.map((p) => p.y);
   const labelTensor = tf.tensor2d(labelValues, [labelValues.length, 1]);
 
   const normalizedFeature = normalize(featureTensor);
   const normalizedLabel = normalize(labelTensor);
+  featureTensor.dispose();
+  labelTensor.dispose();
 
   const [trainingFeatureTensor, testingFeatureTensor] = tf.split(
     normalizedFeature.tensor,
@@ -116,28 +149,14 @@ export async function run(dataset) {
     normalizedLabel.tensor,
     2
   );
-  const model = await createModel();
-  // const trainedModel = await trainModel(
-  //   model,
-  //   trainingFeatureTensor,
-  //   trainingLabelTensor
-  // );
-  // const trainingLoss = trainedModel.history.loss.pop();
-  // const lossTensor = model.evaluate(testingFeatureTensor, testingLabelTensor);
-  // const testingLoss = await lossTensor.dataSync();
-  // const validationLoss = await trainedModel.history.val_loss.pop();
-
-  // await model.save(
-  //   `file:///Users/zegerdevos/Documents/code/MachineLearning/udemy-tfjs/tfjs-backend/src/models/${date}/`
-  // );
 
   return {
     points,
-    model,
     normalizedFeature,
     normalizedLabel,
-    // trainingLoss,
-    // testingLoss,
-    // validationLoss
+    trainingFeatureTensor,
+    trainingLabelTensor,
+    testingFeatureTensor,
+    testingLabelTensor,
   };
 }
