@@ -15,9 +15,12 @@ const Predict = ({ data, model }) => {
 
   function submitInput(event) {
     event.preventDefault();
-    predict(input, model, data.normalizedFeature, data.normalizedLabel).then(
-      setPrediction
-    );
+    predict(
+      input,
+      model.model,
+      data.normalizedFeature,
+      data.normalizedLabel
+    ).then(setPrediction);
   }
 
   const handleChange = (e, value) => setInput(parseInt(value.value));
@@ -33,18 +36,20 @@ const Predict = ({ data, model }) => {
               <Input
                 type="number"
                 size="small"
-                placeholder="enter a value"
+                placeholder="Median income"
                 value={input}
                 onChange={handleChange}
               />
             </Form.Field>
-            <Form.Button onClick={submitInput}>submit</Form.Button>
+            <Form.Button icon="settings" onClick={submitInput}>
+              Submit
+            </Form.Button>
           </Form>
         </Segment>
       </Segment.Group>
       <SegmentGroup>
         <Segment>
-          <Header>Results:</Header>
+          <Header>Predicted house value:</Header>
           <Divider />
           <p>{prediction}</p>
         </Segment>

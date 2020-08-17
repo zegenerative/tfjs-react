@@ -43,7 +43,8 @@ async function train(model, trainingFeatureTensor, trainingLabelTensor) {
     trainingLabelTensor,
     {
       batchSize: 32,
-      epochs: 3,
+      epochs: 20,
+      // epochs: 3,
       callbacks: {
         onEpochEnd,
       },
@@ -65,16 +66,15 @@ export async function testModel(
   testingFeatureTensor,
   testingLabelTensor
 ) {
-  console.log("testing", model, testingFeatureTensor, testingLabelTensor);
   const lossTensor = model.evaluate(testingFeatureTensor, testingLabelTensor);
   const loss = await lossTensor.dataSync();
-  console.log(loss);
   return loss;
 }
 
 const storageID = "test";
 
 export async function saveModel(model) {
+  console.log(model);
   await model.save(`localstorage://${storageID}`);
 }
 
@@ -83,6 +83,7 @@ export async function loadModel() {
   const models = await tf.io.listModels();
   const modelInfo = models[storageKey];
   if (modelInfo) {
+    alert("Model loaded");
     return await tf.loadLayersModel(storageKey);
   }
   return alert("No model found");
@@ -121,7 +122,7 @@ export async function loadData(dataset) {
   const housingDataset = await tf.data.csv(dataset);
 
   const pointsDataset = housingDataset.map((record) => ({
-    x: record.housing_median_age,
+    x: record.median_income,
     y: record.median_house_value,
   }));
   const points = await pointsDataset.toArray();

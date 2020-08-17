@@ -18,18 +18,18 @@ const TrainAndTest = ({ data, loaded, model, setModel }) => {
       return (
         <Message icon>
           <Icon name="circle notched" loading />
-          <Message.Content>We are fetching the dataset</Message.Content>
+          <Message.Content>Fetching data...</Message.Content>
         </Message>
       );
     }
     if (!training && data && !model) {
-      return <Message>Ready to train a model</Message>;
+      return <Message>Ready to prepare and train a model</Message>;
     }
     if (training && data && !model) {
       return (
         <Message icon>
           <Icon name="circle notched" loading />
-          <Message.Content>We are training the model</Message.Content>
+          <Message.Content>Training the model...</Message.Content>
         </Message>
       );
     }
@@ -48,18 +48,17 @@ const TrainAndTest = ({ data, loaded, model, setModel }) => {
       return <Message>No model trained</Message>;
     }
     if (model && !testing) {
-      return <Message>Ready to test a model</Message>;
+      return <Message>Ready to test the model</Message>;
     }
     if (testing === true) {
       return (
         <Message icon>
           <Icon name="circle notched" loading />
-          <Message.Content>We are testing the model</Message.Content>
+          <Message.Content>Testing the model...</Message.Content>
         </Message>
       );
     } else {
-      console.log("got a number", testing);
-      return <Message>loss: {testing}</Message>;
+      return <Message>Loss: {testing}</Message>;
     }
   };
 
@@ -82,7 +81,7 @@ const TrainAndTest = ({ data, loaded, model, setModel }) => {
   return (
     <Segment.Group>
       <Segment>
-        <Header>Train and test your model</Header>
+        <Header>Train and test a model</Header>
         <Divider />
         <Header as="h4">Training status:</Header>
         {showTrainingStatus()}
@@ -90,16 +89,16 @@ const TrainAndTest = ({ data, loaded, model, setModel }) => {
         {showTestingStatus()}
         <Divider />
         <Button disabled={!loaded} onClick={() => onTrainingClick()}>
-          Train model
+          Prepare/Train
         </Button>
         <Button disabled={!model} onClick={() => onTestingClick()}>
-          Test model
+          Test
         </Button>
-        <Button disabled={!loaded} onClick={saveModel}>
-          Save model
+        <Button disabled={!model} onClick={() => saveModel(model.model)}>
+          Save
         </Button>
         <Button disabled={!loaded} onClick={loadModel}>
-          Load model
+          Load
         </Button>
       </Segment>
     </Segment.Group>

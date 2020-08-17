@@ -31,9 +31,9 @@ function App() {
 
   const toggleVisor = () => {
     if (firstOpen) {
-      plot(data.points, "House Age");
+      plot(data.points, "Median income");
       if (modelLoaded) {
-        tfvis.show.modelSummary({ name: "Model summary" }, data.model);
+        tfvis.show.modelSummary({ name: "Model summary" }, model.model);
       }
     } else {
       tfvis.visor().toggle();
@@ -73,7 +73,12 @@ function App() {
             />
           </Segment>
           <Segment>
-            <Predict data={data} loaded={dataLoaded} setData={setData} />
+            <Predict
+              data={data}
+              loaded={dataLoaded}
+              setData={setData}
+              model={model}
+            />
           </Segment>
         </Segment.Group>
       </Container>
