@@ -5,10 +5,10 @@ import * as tfvis from "@tensorflow/tfjs-vis";
 import TrainAndTest from "./components/TrainAndTest";
 import Predict from "./components/Predict";
 import { loadData } from "./tensorflowjs";
-import { plot } from "./utils/tfjsvis";
+import { plot, plotClasses } from "./utils/tfjsvis";
 import { Container, Segment, Button, Grid } from "semantic-ui-react";
 
-const housingPrices = "http://localhost:3000/housing.csv";
+const housingPrices = "http://localhost:3000/kc_house_data.csv";
 
 function App() {
   const [data, setData] = useState(undefined);
@@ -31,7 +31,8 @@ function App() {
 
   const toggleVisor = () => {
     if (firstOpen) {
-      plot(data.points, "Median income");
+      plot(data.points, "Square feet");
+      plotClasses(data.points, "Waterfront");
       if (modelLoaded) {
         tfvis.show.modelSummary({ name: "Model summary" }, model.model);
       }

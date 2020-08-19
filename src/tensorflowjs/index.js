@@ -8,10 +8,27 @@ function createModel() {
 
   model.add(
     tf.layers.dense({
+      units: 10,
+      useBias: true,
+      activation: "sigmoid",
+      inputDim: 1,
+    })
+  );
+
+  model.add(
+    tf.layers.dense({
+      units: 10,
+      useBias: true,
+      activation: "sigmoid",
+    })
+  );
+
+  // output layer
+  model.add(
+    tf.layers.dense({
       units: 1,
       useBias: true,
-      activation: "linear",
-      inputDim: 1,
+      activation: "sigmoid",
     })
   );
 
@@ -43,7 +60,7 @@ async function train(model, trainingFeatureTensor, trainingLabelTensor) {
     trainingLabelTensor,
     {
       batchSize: 32,
-      epochs: 20,
+      epochs: 10,
       // epochs: 3,
       callbacks: {
         onEpochEnd,
@@ -122,18 +139,22 @@ export async function loadData(dataset) {
   const housingDataset = await tf.data.csv(dataset);
 
   const pointsDataset = housingDataset.map((record) => ({
-    x: record.median_income,
-    y: record.median_house_value,
+    x: record.sqft_living,
+    y: record.price,
+    class: record.waterfront,
   }));
   const points = await pointsDataset.toArray();
+  if (points % 2 !== 0) {
+    points.pop();
+  }
   tf.util.shuffle(points);
 
   // extract features
-  const featureValues = points.map((p) => p.x);
-  const featureTensor = tf.tensor2d(featureValues, [featureValues.length, 1]);
+  const featureValues = points.map((p) => [p.x, p.y]);
+  const featureTensor = tf.tensor2d(featureValues);
 
   // extract labels
-  const labelValues = points.map((p) => p.y);
+  const labelValues = points.map((p) => p.class);
   const labelTensor = tf.tensor2d(labelValues, [labelValues.length, 1]);
 
   const normalizedFeature = normalize(featureTensor);
